@@ -1,0 +1,44 @@
+<section class="panel" aria-labelledby="order-entry-heading">
+  <header class="panel-header">
+    <h2 id="order-entry-heading">Order Entry</h2>
+    <p class="panel-subtitle">Submit a new trade ticket</p>
+  </header>
+
+  <form class="entry-form" [formGroup]="form" (ngSubmit)="submit()">
+    <label class="field">
+      <span>Security Name</span>
+      <select formControlName="securityName">
+        @for (symbol of securities; track symbol) {
+          <option [value]="symbol">{{ symbol }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="field">
+      <span>Side</span>
+      <select formControlName="side">
+        @for (side of sides; track side) {
+          <option [value]="side">{{ side }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="field">
+      <span>Quantity</span>
+      <input type="number" formControlName="quantity" min="1" step="1" />
+      @if (form.controls.quantity.touched && form.controls.quantity.invalid) {
+        <span class="field-error">Quantity must be at least 1</span>
+      }
+    </label>
+
+    <label class="field">
+      <span>Price</span>
+      <input type="number" formControlName="price" min="0.01" step="0.01" />
+      @if (form.controls.price.touched && form.controls.price.invalid) {
+        <span class="field-error">Price must be greater than zero</span>
+      }
+    </label>
+
+    <button type="submit" class="btn-submit">Submit Order</button>
+  </form>
+</section>

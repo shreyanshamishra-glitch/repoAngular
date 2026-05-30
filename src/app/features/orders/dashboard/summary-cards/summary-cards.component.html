@@ -1,0 +1,8 @@
+<section class="summary-grid" aria-label="Order summary statistics">
+  @for (card of cards; track card.label) {
+    <article class="summary-card" [class]="card.accent">
+      <p class="summary-label">{{ card.label }}</p>
+      <p class="summary-value">{{ card.value() }}</p>
+    </article>
+  }
+</section>

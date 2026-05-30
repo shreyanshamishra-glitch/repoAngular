@@ -1,0 +1,57 @@
+<section class="panel" aria-labelledby="order-list-heading">
+  <header class="panel-header">
+    <h2 id="order-list-heading">Order Blotter</h2>
+    <p class="panel-subtitle">{{ store.totalOrders() }} orders in book</p>
+  </header>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Order Id</th>
+          <th>Security</th>
+          <th>Side</th>
+          <th class="num">Qty</th>
+          <th class="num">Price</th>
+          <th>Status</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (order of store.orders(); track order.id) {
+          <tr>
+            <td class="mono">{{ order.id }}</td>
+            <td>{{ order.securityName }}</td>
+            <td>
+              <span
+                class="side-badge"
+                [class.side-buy]="order.side === 'BUY'"
+                [class.side-sell]="order.side === 'SELL'"
+              >
+                {{ order.side }}
+              </span>
+            </td>
+            <td class="num">{{ order.quantity }}</td>
+            <td class="num">
+              @if (order.price > 0) {
+                {{ order.price | currency: 'INR' : 'symbol' : '1.2-2' }}
+              } @else {
+                —
+              }
+            </td>
+            <td>
+              <span class="status-badge" [class]="statusClass(order.status)">
+                {{ order.status }}
+              </span>
+            </td>
+            <td class="timestamp">{{ order.timestamp | date: 'medium' }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7" class="empty-row">No orders in the blotter.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
