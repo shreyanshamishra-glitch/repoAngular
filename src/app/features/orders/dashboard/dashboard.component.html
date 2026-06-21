@@ -4,16 +4,37 @@
       <p class="eyebrow">Order Management System</p>
       <h1>Trading Dashboard</h1>
     </div>
-    <p class="live-indicator" aria-live="polite">
-      <span class="live-dot"></span>
-      Mock feed · Signals
-    </p>
+    <div class="header-meta">
+      @if (adminUser(); as admin) {
+        <p class="admin-badge">
+          {{ admin.displayName }}
+          <span class="role">{{ admin.role }}</span>
+        </p>
+      }
+      <p class="live-indicator" aria-live="polite">
+        <span class="live-dot"></span>
+        TradeSim API · Live quotes
+      </p>
+    </div>
   </header>
+
+  @if (store.error()) {
+    <p class="banner-error">{{ store.error() }}</p>
+  }
 
   <app-summary-cards />
 
+  <app-quote-panel />
+
+  <div class="dashboard-panels">
+    <app-api-endpoints-panel />
+  </div>
+
   <div class="dashboard-main">
-    <app-order-entry />
+    <div class="sidebar-stack">
+      <app-order-entry />
+      <app-dummy-order-tool />
+    </div>
     <app-order-list />
   </div>
 </div>

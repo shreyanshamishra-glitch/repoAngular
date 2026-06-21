@@ -1,0 +1,133 @@
+.panel {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--surface);
+  padding: 1.5rem;
+}
+
+.panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.panel-subtitle {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.btn-refresh {
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.banner-error {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: rgba(248, 113, 113, 0.12);
+  color: #fca5a5;
+  font-size: 0.875rem;
+}
+
+.quote-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.875rem;
+}
+
+.quote-card {
+  border: 1px solid var(--border);
+  border-radius: 0.625rem;
+  padding: 1rem;
+  background: var(--bg);
+}
+
+.quote-card-selected {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.quote-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.symbol {
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.change {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.change-up {
+  color: #4ade80;
+}
+
+.change-down {
+  color: #f87171;
+}
+
+.price {
+  margin: 0.5rem 0 0.75rem;
+  font-size: 1.375rem;
+  font-weight: 700;
+}
+
+.quote-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.quote-meta dt {
+  margin: 0;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.quote-meta dd {
+  margin: 0.125rem 0 0;
+  font-size: 0.8125rem;
+  font-family: ui-monospace, monospace;
+}
+
+.trade-day {
+  margin: 0.75rem 0 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}

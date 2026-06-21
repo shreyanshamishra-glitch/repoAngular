@@ -1,10 +1,10 @@
-/** Listed instruments available in the order-entry dropdown (mock market data). */
+/** Default symbols — overridden by API metadata when available. */
 export const SECURITIES = [
-  'RELIANCE',
-  'TCS',
-  'INFY',
-  'HDFCBANK',
-  'ICICIBANK',
+  'IBM',
+  'MSFT',
+  'AAPL',
+  'GOOGL',
+  'TSLA',
 ] as const;
 
 export type SecuritySymbol = (typeof SECURITIES)[number];

@@ -1,25 +1,33 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 
-import { MOCK_ORDERS } from '../../../core/constants/mock-orders.constants';
+import { TradeApiService } from '../../../core/services/trade-api.service';
+import {
+  ApiMetadata,
+  GenerateDummyOrdersRequest,
+} from '../../../core/models/api.model';
 import {
   CreateOrderRequest,
   Order,
-  OrderStatus,
 } from '../../../core/models/order.model';
 
-/**
- * In-memory order store — think of this as a @Service singleton that owns
- * application state. Signals replace RxJS BehaviorSubject for synchronous,
- * fine-grained reactivity (similar to holding state in a Spring bean field
- * and notifying the UI when it changes).
- */
 @Injectable({ providedIn: 'root' })
 export class OrderStoreService {
-  private readonly ordersState = signal<Order[]>([...MOCK_ORDERS]);
-  private idSequence = 1006;
+  private readonly api = inject(TradeApiService);
 
-  /** Read-only view of orders — consumers cannot mutate the signal directly. */
+  private readonly ordersState = signal<Order[]>([]);
+  private readonly loadingState = signal(false);
+  private readonly errorState = signal<string | null>(null);
+  private readonly pageSizeState = signal(10);
+  private readonly maxPageSizeState = signal(50);
+  private readonly metadataState = signal<ApiMetadata | null>(null);
+
   readonly orders = this.ordersState.asReadonly();
+  readonly loading = this.loadingState.asReadonly();
+  readonly error = this.errorState.asReadonly();
+  readonly pageSize = this.pageSizeState.asReadonly();
+  readonly maxPageSize = this.maxPageSizeState.asReadonly();
+  readonly metadata = this.metadataState.asReadonly();
 
   readonly totalOrders = computed(() => this.orders().length);
 
@@ -35,25 +43,76 @@ export class OrderStoreService {
     () => this.orders().filter((o) => o.status === 'REJECTED').length,
   );
 
-  addOrder(request: CreateOrderRequest): void {
-    const status = this.resolveStatus(request);
-    const order: Order = {
-      id: `ORD-${this.idSequence++}`,
-      securityName: request.securityName,
-      side: request.side,
-      quantity: request.quantity,
-      price: request.price,
-      status,
-      timestamp: new Date(),
-    };
-
-    this.ordersState.update((orders) => [order, ...orders]);
+  async initialize(): Promise<void> {
+    await Promise.all([this.loadMetadata(), this.refreshOrders()]);
   }
 
-  private resolveStatus(request: CreateOrderRequest): OrderStatus {
-    if (request.quantity <= 0 || request.price <= 0) {
-      return 'REJECTED';
+  async loadMetadata(): Promise<void> {
+    try {
+      const metadata = await firstValueFrom(this.api.getMetadata());
+      this.metadataState.set(metadata);
+      this.pageSizeState.set(metadata.pagination.defaultPageSize);
+      this.maxPageSizeState.set(metadata.pagination.maxPageSize);
+    } catch {
+      this.errorState.set('Unable to load API metadata from TradeSim backend.');
     }
-    return 'PENDING';
+  }
+
+  async refreshOrders(): Promise<void> {
+    this.loadingState.set(true);
+    this.errorState.set(null);
+
+    try {
+      const response = await firstValueFrom(
+        this.api.listOrders(0, this.pageSizeState()),
+      );
+      this.ordersState.set(
+        response.content.map((order) => ({
+          ...order,
+          timestamp: new Date(order.timestamp),
+        })),
+      );
+      this.maxPageSizeState.set(response.maxPageSize);
+    } catch {
+      this.errorState.set('Unable to load orders. Is the backend running on port 8080?');
+    } finally {
+      this.loadingState.set(false);
+    }
+  }
+
+  async addOrder(request: CreateOrderRequest): Promise<void> {
+    this.loadingState.set(true);
+    this.errorState.set(null);
+
+    try {
+      const created = await firstValueFrom(this.api.createOrder(request));
+      const order: Order = {
+        ...created,
+        timestamp: new Date(created.timestamp),
+      };
+      this.ordersState.update((orders) => [order, ...orders]);
+    } catch {
+      this.errorState.set('Failed to submit order.');
+    } finally {
+      this.loadingState.set(false);
+    }
+  }
+
+  async generateDummyOrders(request: GenerateDummyOrdersRequest): Promise<void> {
+    this.loadingState.set(true);
+    this.errorState.set(null);
+
+    try {
+      const created = await firstValueFrom(this.api.generateDummyOrders(request));
+      const normalized = created.map((order) => ({
+        ...order,
+        timestamp: new Date(order.timestamp),
+      }));
+      this.ordersState.update((orders) => [...normalized, ...orders]);
+    } catch {
+      this.errorState.set('Failed to generate dummy orders.');
+    } finally {
+      this.loadingState.set(false);
+    }
   }
 }

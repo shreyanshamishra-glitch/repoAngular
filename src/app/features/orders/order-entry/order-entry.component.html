@@ -8,10 +8,13 @@
     <label class="field">
       <span>Security Name</span>
       <select formControlName="securityName">
-        @for (symbol of securities; track symbol) {
+        @for (symbol of securities(); track symbol) {
           <option [value]="symbol">{{ symbol }}</option>
         }
       </select>
+      @if (quoteHint) {
+        <span class="quote-hint">{{ quoteLoading ? 'Loading quote…' : quoteHint }}</span>
+      }
     </label>
 
     <label class="field">

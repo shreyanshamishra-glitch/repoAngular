@@ -34,7 +34,7 @@
             <td class="num">{{ order.quantity }}</td>
             <td class="num">
               @if (order.price > 0) {
-                {{ order.price | currency: 'INR' : 'symbol' : '1.2-2' }}
+                {{ order.price | currency: 'USD' : 'symbol' : '1.2-2' }}
               } @else {
                 —
               }

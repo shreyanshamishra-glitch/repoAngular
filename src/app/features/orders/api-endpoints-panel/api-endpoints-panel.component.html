@@ -1,0 +1,56 @@
+<section class="panel" aria-labelledby="api-endpoints-heading">
+  <header class="panel-header">
+    <h2 id="api-endpoints-heading">API Endpoints</h2>
+    <p class="panel-subtitle">
+      Discovered from backend metadata · max page size
+      {{ store.maxPageSize() }}
+    </p>
+  </header>
+
+  <ul class="endpoint-list">
+    @for (endpoint of store.metadata()?.endpoints ?? []; track endpoint.id) {
+      <li class="endpoint-item">
+        <div class="endpoint-row">
+          <span class="method" [class]="'method-' + endpoint.method.toLowerCase()">
+            {{ endpoint.method }}
+          </span>
+          <code class="path">/api{{ endpoint.path }}</code>
+        </div>
+        <p class="name">{{ endpoint.name }}</p>
+        <p class="description">{{ endpoint.description }}</p>
+        @if (endpoint.queryParams.length) {
+          <p class="params">
+            Params:
+            @for (param of endpoint.queryParams; track param; let last = $last) {
+              <span class="param">{{ param }}</span>@if (!last) {, }
+            }
+          </p>
+        }
+      </li>
+    } @empty {
+      <li class="empty">Loading endpoint metadata…</li>
+    }
+  </ul>
+
+  @if (store.metadata()?.attributes; as attributes) {
+    <details class="attributes">
+      <summary>Field constraints (MAX_PAGE_SIZE = {{ store.maxPageSize() }})</summary>
+      <dl>
+        @for (entry of attributes | keyvalue; track entry.key) {
+          <div class="attr-row">
+            <dt>{{ entry.value.label }}</dt>
+            <dd>
+              {{ entry.value.type }}
+              @if (entry.value.min !== null) {
+                · min {{ entry.value.min }}
+              }
+              @if (entry.value.max !== null) {
+                · max {{ entry.value.max }}
+              }
+            </dd>
+          </div>
+        }
+      </dl>
+    </details>
+  }
+</section>

@@ -1,0 +1,61 @@
+<section class="panel" aria-labelledby="quote-panel-heading">
+  <header class="panel-header">
+    <div>
+      <h2 id="quote-panel-heading">Live Quotes</h2>
+      <p class="panel-subtitle">Alpha Vantage GLOBAL_QUOTE feed</p>
+    </div>
+    <button type="button" class="btn-refresh" (click)="loadQuotes()" [disabled]="loading()">
+      {{ loading() ? 'Refreshing…' : 'Refresh' }}
+    </button>
+  </header>
+
+  @if (error()) {
+    <p class="banner-error">{{ error() }}</p>
+  }
+
+  <div class="quote-grid">
+    @for (quote of quotes(); track quote.symbol) {
+      <article
+        class="quote-card"
+        [class.quote-card-selected]="quote.symbol === selectedSymbol()"
+      >
+        <div class="quote-head">
+          <span class="symbol">{{ quote.symbol }}</span>
+          <span
+            class="change"
+            [class.change-up]="isPositive(quote.changePercent)"
+            [class.change-down]="!isPositive(quote.changePercent)"
+          >
+            {{ quote.changePercent }}
+          </span>
+        </div>
+        <p class="price">
+          {{ parsePrice(quote.price) | currency: 'USD' : 'symbol' : '1.2-2' }}
+        </p>
+        <dl class="quote-meta">
+          <div>
+            <dt>Open</dt>
+            <dd>{{ quote.open }}</dd>
+          </div>
+          <div>
+            <dt>High</dt>
+            <dd>{{ quote.high }}</dd>
+          </div>
+          <div>
+            <dt>Low</dt>
+            <dd>{{ quote.low }}</dd>
+          </div>
+          <div>
+            <dt>Volume</dt>
+            <dd>{{ quote.volume }}</dd>
+          </div>
+        </dl>
+        <p class="trade-day">As of {{ quote.latestTradingDay }}</p>
+      </article>
+    } @empty {
+      @if (!loading() && !error()) {
+        <p class="empty">No quotes loaded yet.</p>
+      }
+    }
+  </div>
+</section>
